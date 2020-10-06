@@ -1,16 +1,20 @@
 import numpy as np
 from random import seed
 import argparse
+
 import lime
+from lime import submodular_pick
 import lime.lime_tabular
 import ipdb
 
 from data import load_data, split_data, \
     pima_training_data_transformation, pima_test_data_transformation
 
-from trainer import evaluate_algorithm, biased_random_forest, train_biased_random_forest, test_random_forest
+from trainer import evaluate_algorithm, biased_random_forest, train_biased_random_forest, test_random_forest, \
+    BiasedRandomForestModel
 from metrics import display_metrics
 from plotting import save_prc_curve, save_roc_curve
+
 
 
 def main():
@@ -71,7 +75,6 @@ def main():
     save_prc_curve(recalls, precisions, name=outname)
     save_roc_curve(fp_rates, tp_rates, name=outname)
 
-    ipdb.set_trace()
     # LIME
     df_features = data_train.iloc[:, :-1]
     feature_cols = df_features.columns
@@ -81,6 +84,14 @@ def main():
     explainer = lime.lime_tabular.LimeTabularExplainer(data_features,
                                                        mode='classification', training_labels=data_labels,
                                                        feature_names=feature_cols)
+
+    model = BiasedRandomForestModel(trees)
+    ipdb.set_trace()
+
+    sp_obj = submodular_pick.SubmodularPick(explainer, data_features, model.get_probs,
+                                            sample_size=20, num_features=7, num_exps_desired=5)
+
+    [exp.as_pyplot_figure() for exp in sp_obj.sp_explanations];
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import numpy as np
 from random import randrange
 import metrics
 import pandas as pd
+import ipdb
 
 from plotting import save_prc_curve, save_roc_curve
 
@@ -323,3 +324,27 @@ def kneighbors(min_point, maj_dataset, n_neighbors):
 	return neigh_ind
 
 
+class BiasedRandomForestModel:
+	def __init__(self, trees):
+		self.trees = trees
+
+	# Probability determination function for LIME
+	def get_probs(self, test):
+		probs = list()
+
+		# if test is 1d array
+		if test.ndim == 1:
+			_, prob = bagging_predict(self.trees, test)
+			probs.append(prob)
+
+		# if array is not 1d
+		else:
+		# generate predictions and probabilities using bag predict
+			for row in test:
+				_, prob = bagging_predict(self.trees, row)
+				probs.append(prob)
+
+		probs = np.asarray(probs)
+		# Probs must be formatted as [p(class 0), p(class 1)]
+		probs_array = np.array(list(zip(1.0 - probs, probs)))
+		return probs_array
