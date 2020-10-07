@@ -92,6 +92,11 @@ def evaluate_algorithm(dataset, algorithm, n_folds, n_neighbors, p_critical, *ar
 		outname = 'Fold' + str(i+1)
 		save_roc_curve(fp_rates_list[i], tp_rates_list[i], name=outname)
 
+	pd.DataFrame(recall_list).to_csv("recalls.csv")
+	pd.DataFrame(precision_list).to_csv("precisions.csv")
+	pd.DataFrame(fp_rates_list).to_csv("fprates.csv")
+	pd.DataFrame(tp_rates_list).to_csv("tprates.csv")
+
 	return trees
 
 
@@ -243,7 +248,7 @@ def biased_random_forest(train_full, train_critical, test, max_depth, min_size, 
 	probs = list()
 
 	# calculate split of trees for the full/critical datasets
-	n_trees_full = int(n_trees * (1 - p_split))
+	n_trees_full = int(n_trees * (1.0 - p_split))
 	n_trees_critical = int(n_trees * p_split)
 
 	# Build forest on full train set
