@@ -92,10 +92,11 @@ def evaluate_algorithm(dataset, algorithm, n_folds, n_neighbors, p_critical, *ar
 		outname = 'Fold' + str(i+1)
 		save_roc_curve(fp_rates_list[i], tp_rates_list[i], name=outname)
 
-	pd.DataFrame(recall_list).to_csv("recalls.csv")
-	pd.DataFrame(precision_list).to_csv("precisions.csv")
-	pd.DataFrame(fp_rates_list).to_csv("fprates.csv")
-	pd.DataFrame(tp_rates_list).to_csv("tprates.csv")
+	# Can use this to export data for detailed plots of ROC/PRC curves
+	# pd.DataFrame(recall_list).to_csv("recalls.csv")
+	# pd.DataFrame(precision_list).to_csv("precisions.csv")
+	# pd.DataFrame(fp_rates_list).to_csv("fprates.csv")
+	# pd.DataFrame(tp_rates_list).to_csv("tprates.csv")
 
 	return trees
 
