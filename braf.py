@@ -3,15 +3,14 @@ from random import seed
 import argparse
 
 import lime
-# from lime import submodular_pick
 import lime.lime_tabular
-
 
 from data import load_data, split_data, \
     pima_training_data_transformation, pima_test_data_transformation
 
-from trainer import evaluate_algorithm, biased_random_forest, train_biased_random_forest, test_random_forest, \
-    BiasedRandomForestModel
+from trainer import evaluate_algorithm, biased_random_forest, train_biased_random_forest,\
+    test_random_forest, BiasedRandomForestModel
+
 from metrics import display_metrics
 from plotting import save_prc_curve, save_roc_curve
 
@@ -38,7 +37,7 @@ def main():
     # Prep data for model training
     data = load_data(args.data_path)
     raw_data_train, raw_data_test = split_data(data)
-    data_train, medians = pima_training_data_transformation(raw_data_train)
+    data_train, scaler, medians = pima_training_data_transformation(raw_data_train)
 
     # Evaluate algorithm on training data using K-Fold cross validation
     _ = evaluate_algorithm(data_train, biased_random_forest, args.n_folds,
@@ -53,7 +52,7 @@ def main():
 
     # Evaluate model on test data
     # Prepare test data
-    data_test = pima_test_data_transformation(raw_data_test, medians).to_numpy()
+    data_test = pima_test_data_transformation(raw_data_test, scaler, medians).to_numpy()
 
     test_set = list()
     for row in data_test:
@@ -86,13 +85,11 @@ def main():
 
     model = BiasedRandomForestModel(trees)
 
+    # ipdb is useful here for further exploration in LIME. This can also be moved to a follow-up notebook.
+    # ipdb.set_trace()
     idx = 0
     exp = explainer.explain_instance(data_features[idx], model.get_probs, num_features=7)
     exp.save_to_file('lime_rf_example0.html')
-    # sp_obj = submodular_pick.SubmodularPick(explainer, data_features, model.get_probs,
-    #                                         sample_size=20, num_features=7, num_exps_desired=5)
-
-    # [exp.as_pyplot_figure() for exp in sp_obj.sp_explanations]
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing
 
 
 # Load data from path
@@ -52,11 +53,15 @@ def pima_training_data_transformation(data):
         "st_median": st_median
     }
 
-    return data, medians
+    # data must be normalized to use Euclidian distance in KNN algorithm
+    scaler = preprocessing.StandardScaler().fit(data)
+    scaled_data = scaler.transform(data)
+
+    return scaled_data, scaler, medians
 
 
-def pima_test_data_transformation(data, medians):
-    # Data transformation used for test set, using training data medians
+def pima_test_data_transformation(data, scaler, medians):
+    # Data transformation used for test set, using training data medians and scaler
 
     # Glucose Transformation
     gl_mask = data['Glucose'] == 0
@@ -77,4 +82,6 @@ def pima_test_data_transformation(data, medians):
     # Drop Insulin Column
     data = data.drop(columns=['Insulin'])
 
-    return data
+    scaled_data = scaler.transform(data)
+
+    return scaled_data
