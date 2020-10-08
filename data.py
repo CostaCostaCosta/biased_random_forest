@@ -56,8 +56,9 @@ def pima_training_data_transformation(data):
     # data must be normalized to use Euclidian distance in KNN algorithm
     scaler = preprocessing.StandardScaler().fit(data)
     scaled_data = scaler.transform(data)
+    scaled_data_df = pd.DataFrame(scaled_data)
 
-    return scaled_data, scaler, medians
+    return data, scaler, medians
 
 
 def pima_test_data_transformation(data, scaler, medians):
@@ -83,5 +84,6 @@ def pima_test_data_transformation(data, scaler, medians):
     data = data.drop(columns=['Insulin'])
 
     scaled_data = scaler.transform(data)
+    scaled_data_df = pd.DataFrame(scaled_data)
 
-    return scaled_data
+    return data
